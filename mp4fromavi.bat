@@ -72,9 +72,11 @@ exit
 
 
 :movieread
-set AVSFILE="%~dpn1.avs"
+set AVSFILE="%~dpn1_ame.avs"
 if "%~x1" == ".avi" (
   call :aviread "%~1"
+) else if "%~x1" == ".avs" (
+  call :avsread "%~1"
 ) else (
   call :dsread "%~1"
 )
@@ -88,6 +90,10 @@ exit /b
 
 :dsread
 echo DirectShowSource(%*) 1>%AVSFILE%
+exit /b
+
+:avsread
+echo Import(%*) 1>%AVSFILE%
 exit /b
 
 :assread2
