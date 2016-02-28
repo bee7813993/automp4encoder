@@ -19,8 +19,12 @@ setupフォルダの中にある「AviSynth_260.exe」を実行してavisynthを
 setupフォルダの中の「VSFilterMod.dll」 を  
 C:\Program Files (x86)\AviSynth\plugins  
 あたり(環境によって別の所かも)にコピー
-4. makesendto.batを実行してsendtoメニューを追加する。
-5. (任意)setupフォルダの中のavisynth.dll ファイルは  
+4. LAV Filtersをダウンロードしてきてインストールする。  
+（配布元） [https://github.com/Nevcairiel/LAVFilters/releases](https://github.com/Nevcairiel/LAVFilters/releases)  
+LAVFilters-0.XX-Installer.exe をダウンロードしてきて実行。  
+インストールオプション等は最初からついているチェックのままでOK。
+5. makesendto.batを実行してsendtoメニューを追加する。
+6. (任意)setupフォルダの中のavisynth.dll ファイルは  
 C:\Windows\SysWOW64  
 もしくは  
 C:\Windows\System32  
