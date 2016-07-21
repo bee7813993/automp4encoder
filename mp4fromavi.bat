@@ -21,6 +21,8 @@ set CMDAVSWAV="%~dp0\avs2wav32.exe"
 set CMDX264="%~dp0\x264.2665.x86.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
+set DLLFFMS="%~dp0\ffms2.dll"
+set DLLVSFILTER="%~dp0\VSFilterMod.dll"
 
 
 set MOVIEINDEX=0
@@ -58,10 +60,10 @@ call :get_extension %VIDEOFINISHFILE%
 set EXT=%extension%
 set FINFILE=%filebody%
 IF EXIST %VIDEOFINISHFILE% (
-    call :setvideofinishfile "%FINFILE%(%COUNT%)%EXT%"
+    call :setvideofinishfile "%FINFILE%_encoded%EXT%"
 )
 %CMDMP4BOX% -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
-del %AVSFILE%
+rem del %AVSFILE%
 del %TMPAUDIOWAVFILE%
 del %TMPAUDIOM4AFILE%
 del %TMPVIDEONOAUDIOFILE%
@@ -89,7 +91,9 @@ echo DirectShowSource(%*) 1>%AVSFILE%
 exit /b
 
 :dsread
-echo DirectShowSource(%*) 1>%AVSFILE%
+echo LoadPlugin(%DLLFFMS%) 1>%AVSFILE%
+echo FFVideoSource(%*) 1>>%AVSFILE%
+echo AudioDub(FFAudioSource(%*)) 1>>%AVSFILE%
 exit /b
 
 :avsread
@@ -97,11 +101,12 @@ echo Import(%*) 1>%AVSFILE%
 exit /b
 
 :assread2
+echo LoadPlugin(%DLLVSFILTER%) 1>>%AVSFILE%
 echo TextsubMod(%*) 1>>%AVSFILE%
 exit /b
 
 :setvideofinishfile
-set VIDEOFINISHFILE="%FINFILE%(%COUNT%)%EXT%"
+set VIDEOFINISHFILE="%FINFILE%_encoded%EXT%"
 exit /b
 
 
