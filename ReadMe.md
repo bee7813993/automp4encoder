@@ -22,7 +22,9 @@ setupフォルダの中にある「AviSynth_260.exe」を実行してavisynthを
 LAVFilters-0.XX-Installer.exe をダウンロードしてきて実行。  
 インストールオプション等は最初からついているチェックのままでOK。  
 4. makesendto.batを実行してsendtoメニューを追加する。  
-5. (任意)setupフォルダの中のavisynth.dll ファイルは  
+5. 実行中に 「MSVCR100.dllがありません」などのエラーが出る場合は  
+https://www.microsoft.com/ja-jp/download/details.aspx?id=8328 より vcredist_x86.exeをダウンロードして実行しておく。  
+6. (任意)setupフォルダの中のavisynth.dll ファイルは  
 C:\Windows\SysWOW64  
 もしくは  
 C:\Windows\System32  
@@ -86,7 +88,8 @@ A. AegiSubで確認するのがいいと思う。不安定とかいう人いる�
 2016.02.10 v0.0.3   つんでれんこ対応。ファイル選択の順番を気にしなくてよくなった。  SendToショートカット自動生成コマンド追加  
 2016.02.27 v0.0.4   avsファイル対応  
 2016.07.21 v0.0.5   セットアップにDLLのコピーが不要となった。エンコード後音が早送りになった不具合を解消  
-2016.07.24 v0.0.6   QSVエンコードに対応。
+2016.07.24 v0.0.6   QSVエンコードに対応  
+2016.08.23 v0.0.7   MP4BOX用DLLを追加
 
 ## バグ
 ファイル名に 「,」(半角カンマ)が入っていると処理に失敗する
