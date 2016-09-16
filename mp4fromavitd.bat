@@ -14,6 +14,7 @@ set CMDX264="%~dp0\x264.2665.x86.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
 set DLLFFMS="%~dp0\ffms2.dll"
+set DLLLAMDASH="%~dp0\LSMASHSource.dll"
 set DLLVSFILTER="%~dp0\VSFilterMod.dll"
 
 
@@ -55,6 +56,10 @@ if "%~x1" == ".avi" (
   call :aviread "%~1"
 ) else if "%~x1" == ".avs" (
   call :avsread "%~1"
+) else if "%~x1" == ".ts" (
+  call :tsread "%~1"
+) else if "%~x1" == ".m2ts" (
+  call :tsread "%~1"
 ) else (
   call :dsread "%~1"
 )
@@ -67,9 +72,18 @@ echo DirectShowSource(%*) 1>%AVSFILE%
 exit /b
 
 :dsread
-echo LoadPlugin(%DLLFFMS%) 1>%AVSFILE%
-echo FFVideoSource(%*) 1>>%AVSFILE%
-echo AudioDub(FFAudioSource(%*)) 1>>%AVSFILE%
+rem echo LoadPlugin(%DLLFFMS%) 1>%AVSFILE%
+rem echo FFVideoSource(%*) 1>>%AVSFILE%
+rem echo AudioDub(FFAudioSource(%*)) 1>>%AVSFILE%
+echo LoadPlugin(%DLLLAMDASH%) 1>%AVSFILE%
+echo LSMASHVideoSource(%*) 1>>%AVSFILE%
+echo AudioDub(LSMASHAudioSource(%*)) 1>>%AVSFILE%
+exit /b
+
+:tsread
+echo LoadPlugin(%DLLLAMDASH%) 1>%AVSFILE%
+echo LWLibavVideoSource(source=%*, stream_index=-1, repeat=true) 1>>%AVSFILE%
+echo AudioDub(LWLibavAudioSource(source=%*, stream_index=-1, av_sync=false)) 1>>%AVSFILE%
 exit /b
 
 :avsread
