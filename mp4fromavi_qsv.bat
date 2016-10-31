@@ -9,8 +9,8 @@ IF ERRORLEVEL 1 (
     EXIT /B 1
 )
 
-
-set VIDEOQUALITY=24
+rem ####「VIDEOQUALITY=」の後ろに数字を指定すると、「動画の圧縮品質の指定」の操作を省略できます。
+set VIDEOQUALITY=
 set AUDIOQUALITY=0.95
 
 set TMPAUDIOWAVFILE="%~dpn1.wav"
@@ -22,13 +22,17 @@ set CMDX264="%~dp0\x264.2665.x86.exe"
 set CMDQSVENC="%~dp0\QSVEnc\QSVEncC.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
-set DLLFFMS="%~dp0\ffms2.dll"
-set DLLLAMDASH="%~dp0\LSMASHSource.dll"
-set DLLVSFILTER="%~dp0\VSFilterMod.dll"
+set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
+set DLLLAMDASH="%~dp0\AvisynthPlugins\LSMASHSource.dll"
+set DLLVSFILTER="%~dp0\AvisynthPlugins\VSFilterMod.dll"
 
 
 set MOVIEINDEX=0
 set ASSINDEX=0
+
+IF "%VIDEOQUALITY%" EQU "" (
+    SET /P VIDEOQUALITY=動画の圧縮品質の指定 [ファイル大:1⇔51:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
+)
 
 FOR /L %%i IN (1,1,!ARGC!) DO (
   call :check_filekind !ARG%%iQ!
@@ -56,7 +60,10 @@ echo return last 1>>%AVSFILE%
 
 %CMDAVSWAV% %AVSFILE% %TMPAUDIOWAVFILE%
 rem %CMDX264% -q %VIDEOQUALITY% --threads auto --output %TMPVIDEONOAUDIOFILE%  %AVSFILE%
-%CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+%CMDQSVENC% -u 4 --la-icq %VIDEOQUALITY% --la-depth 80 --la-quality slow -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+if not %ERRORLEVEL% 0 (
+    %CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+)
 %CMDAACENC% -q %AUDIOQUALITY% -ignorelength -if %TMPAUDIOWAVFILE% -of %TMPAUDIOM4AFILE%
 set COUNT=1
 call :get_extension %VIDEOFINISHFILE%

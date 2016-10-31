@@ -9,8 +9,8 @@ IF ERRORLEVEL 1 (
     EXIT /B 1
 )
 
-
-set VIDEOQUALITY=24
+rem ####「VIDEOQUALITY=」の後ろに数字を指定すると、「動画の圧縮品質の指定」の操作を省略できます。
+set VIDEOQUALITY=
 set AUDIOQUALITY=0.95
 
 set TMPAUDIOWAVFILE="%~dpn1.wav"
@@ -21,14 +21,20 @@ set CMDAVSWAV="%~dp0\avs2wav32.exe"
 set CMDX264="%~dp0\x264.2665.x86.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
-set DLLFFMS="%~dp0\ffms2.dll"
-set DLLLAMDASH="%~dp0\LSMASHSource.dll"
-set DLLVSFILTER="%~dp0\VSFilterMod.dll"
+set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
+set DLLLAMDASH="%~dp0\AvisynthPlugins\LSMASHSource.dll"
+set DLLVSFILTER="%~dp0\AvisynthPlugins\VSFilterMod.dll"
 
 
 set MOVIEINDEX=0
 set ASSINDEX=0
 
+IF "%VIDEOQUALITY%" EQU "" (
+    SET /P VIDEOQUALITY=動画の圧縮品質の指定 [ファイル大:0⇔69:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
+)
+
+ECHO %VIDEOQUALITY%
+exit /b
 FOR /L %%i IN (1,1,!ARGC!) DO (
   call :check_filekind !ARG%%iQ!
 

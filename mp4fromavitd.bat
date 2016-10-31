@@ -13,9 +13,9 @@ set CMDAVSWAV="%~dp0\avs2wav32.exe"
 set CMDX264="%~dp0\x264.2665.x86.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
-set DLLFFMS="%~dp0\ffms2.dll"
-set DLLLAMDASH="%~dp0\LSMASHSource.dll"
-set DLLVSFILTER="%~dp0\VSFilterMod.dll"
+set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
+set DLLLAMDASH="%~dp0\AvisynthPlugins\LSMASHSource.dll"
+set DLLVSFILTER="%~dp0\AvisynthPlugins\VSFilterMod.dll"
 
 
 set MOVIEINDEX=0
