@@ -30,11 +30,13 @@ set MOVIEINDEX=0
 set ASSINDEX=0
 
 IF "%VIDEOQUALITY%" EQU "" (
-    SET /P VIDEOQUALITY=動画の圧縮品質の指定 [ファイル大:0⇔69:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
+    SET /P VIDEOQUALITY=動画の圧縮品質の指定[省略:24] [ファイル大:0⇔69:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
 )
 
-ECHO %VIDEOQUALITY%
-exit /b
+IF "%VIDEOQUALITY%" EQU "" (
+    SET VIDEOQUALITY=24
+)
+
 FOR /L %%i IN (1,1,!ARGC!) DO (
   call :check_filekind !ARG%%iQ!
 
@@ -70,7 +72,7 @@ IF EXIST %VIDEOFINISHFILE% (
     call :setvideofinishfile "%FINFILE%_encoded%EXT%"
 )
 %CMDMP4BOX% -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
-rem del %AVSFILE%
+del %AVSFILE%
 del %TMPAUDIOWAVFILE%
 del %TMPAUDIOM4AFILE%
 del %TMPVIDEONOAUDIOFILE%

@@ -31,8 +31,13 @@ set MOVIEINDEX=0
 set ASSINDEX=0
 
 IF "%VIDEOQUALITY%" EQU "" (
-    SET /P VIDEOQUALITY=動画の圧縮品質の指定 [ファイル大:1⇔51:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
+    SET /P VIDEOQUALITY=動画の圧縮品質の指定[省略:24] [ファイル大:1⇔51:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
 )
+
+IF "%VIDEOQUALITY%" EQU "" (
+    SET VIDEOQUALITY=24
+)
+
 
 FOR /L %%i IN (1,1,!ARGC!) DO (
   call :check_filekind !ARG%%iQ!
@@ -61,7 +66,7 @@ echo return last 1>>%AVSFILE%
 %CMDAVSWAV% %AVSFILE% %TMPAUDIOWAVFILE%
 rem %CMDX264% -q %VIDEOQUALITY% --threads auto --output %TMPVIDEONOAUDIOFILE%  %AVSFILE%
 %CMDQSVENC% -u 4 --la-icq %VIDEOQUALITY% --la-depth 80 --la-quality slow -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
-if not %ERRORLEVEL% 0 (
+if not %ERRORLEVEL% == 0 (
     %CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
 )
 %CMDAACENC% -q %AUDIOQUALITY% -ignorelength -if %TMPAUDIOWAVFILE% -of %TMPAUDIOM4AFILE%
@@ -73,7 +78,7 @@ IF EXIST %VIDEOFINISHFILE% (
     call :setvideofinishfile "%FINFILE%_encoded%EXT%"
 )
 %CMDMP4BOX% -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
-rem del %AVSFILE%
+del %AVSFILE%
 del %TMPAUDIOWAVFILE%
 del %TMPAUDIOM4AFILE%
 del %TMPVIDEONOAUDIOFILE%
