@@ -13,9 +13,9 @@ rem ####ÅuVIDEOQUALITY=ÅvÇÃå„ÇÎÇ…êîéöÇéwíËÇ∑ÇÈÇ∆ÅAÅuìÆâÊÇÃà≥èkïiéøÇÃéwíËÅvÇÃëÄç
 set VIDEOQUALITY=
 set AUDIOQUALITY=0.95
 
-set TMPAUDIOWAVFILE="%~dpn1.wav"
-set TMPAUDIOM4AFILE="%~dpn1.m4a"
-set TMPVIDEONOAUDIOFILE="%~dpn1_noaudio.mp4"
+set TMPAUDIOWAVFILE="%~n1.wav"
+set TMPAUDIOM4AFILE="%~n1.m4a"
+set TMPVIDEONOAUDIOFILE="%~n1_noaudio.mp4"
 
 set CMDAVSWAV="%~dp0\avs2wav32.exe"
 set CMDX264="%~dp0\x264.2665.x86.exe"
@@ -25,7 +25,7 @@ set CMDMP4BOX="%~dp0\MP4Box.exe"
 set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
 set DLLLAMDASH="%~dp0\AvisynthPlugins\LSMASHSource.dll"
 set DLLVSFILTER="%~dp0\AvisynthPlugins\VSFilterMod.dll"
-
+set WORKFOLDER="%~dp1"
 
 set MOVIEINDEX=0
 set ASSINDEX=0
@@ -37,7 +37,6 @@ IF "%VIDEOQUALITY%" EQU "" (
 IF "%VIDEOQUALITY%" EQU "" (
     SET VIDEOQUALITY=24
 )
-
 
 FOR /L %%i IN (1,1,!ARGC!) DO (
   call :check_filekind !ARG%%iQ!
@@ -58,7 +57,7 @@ set fn=!ASSFILE[%%L]!
 call :assread2 !fn!
 )
 
-
+pushd %WORKFOLDER%
 
 echo return last 1>>%AVSFILE%
 
@@ -77,19 +76,23 @@ set FINFILE=%filebody%
 IF EXIST %VIDEOFINISHFILE% (
     call :setvideofinishfile "%FINFILE%_encoded%EXT%"
 )
-%CMDMP4BOX% -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
-del %AVSFILE%
-del %TMPAUDIOWAVFILE%
-del %TMPAUDIOM4AFILE%
-del %TMPVIDEONOAUDIOFILE%
+
+%CMDMP4BOX% -tmp . -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
+if %ERRORLEVEL% == 0 (
+ del %AVSFILE%
+ del %TMPAUDIOWAVFILE%
+ del %TMPAUDIOM4AFILE%
+ del %TMPVIDEONOAUDIOFILE%
+)
 
 echo ÉGÉìÉRÅ[ÉhäÆóπÅIÅIÅI
+popd
 pause
 exit
 
 
 :movieread
-set AVSFILE="%~dpn1_ame.avs"
+set AVSFILE="%~n1_ame.avs"
 if "%~x1" == ".avi" (
   call :aviread "%~1"
 ) else if "%~x1" == ".avs" (
@@ -101,7 +104,7 @@ if "%~x1" == ".avi" (
 ) else (
   call :dsread "%~1"
 )
-set VIDEOFINISHFILE="%~dpn1.mp4"
+set VIDEOFINISHFILE="%~n1.mp4"
 exit /b
 
 
@@ -146,7 +149,7 @@ exit /b
 :get_extension
 set extension=%~x1
 rem set extension=%extension:~1%
-set filebody=%~dpn1
+set filebody=%~n1
 rem set filebody=%filebody:~1%
 exit /b
 
