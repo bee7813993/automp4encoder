@@ -18,8 +18,9 @@ set TMPAUDIOM4AFILE="%~n1.m4a"
 set TMPVIDEONOAUDIOFILE="%~n1_noaudio.mp4"
 
 set CMDAVSWAV="%~dp0\avs2wav32.exe"
-set CMDX264="%~dp0\x264.2665.x86.exe"
+set CMDX264="%~dp0\x264_2851_x86.exe"
 set CMDQSVENC="%~dp0\QSVEnc\QSVEncC.exe"
+set CMDNVENC="%~dp0\NVEncC\NVEncC.exe"
 set CMDAACENC="%~dp0\neroAacEnc.exe"
 set CMDMP4BOX="%~dp0\MP4Box.exe"
 set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
@@ -29,6 +30,9 @@ set WORKFOLDER="%~dp1"
 
 set MOVIEINDEX=0
 set ASSINDEX=0
+set ERRFLG=0
+
+pushd %WORKFOLDER%
 
 IF "%VIDEOQUALITY%" EQU "" (
     SET /P VIDEOQUALITY=動画の圧縮品質の指定[省略:24] [ファイル大:1⇔51:ファイル小（例）動画編集作業用:4，アニメ等:24，実写等:32]
@@ -57,18 +61,18 @@ set fn=!ASSFILE[%%L]!
 call :assread2 !fn!
 )
 
-pushd %WORKFOLDER%
 
 echo return last 1>>%AVSFILE%
 
 
 %CMDAVSWAV% %AVSFILE% %TMPAUDIOWAVFILE%
 rem %CMDX264% -q %VIDEOQUALITY% --threads auto --output %TMPVIDEONOAUDIOFILE%  %AVSFILE%
-%CMDQSVENC% -u 4 --la-icq %VIDEOQUALITY% --la-depth 80 --la-quality slow -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
-if not %ERRORLEVEL% == 0 (
-    %CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
-)
+%CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+rem %CMDNVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+set /a "ERRFLG = ERRFLG + ERRORLEVEL"
 %CMDAACENC% -q %AUDIOQUALITY% -ignorelength -if %TMPAUDIOWAVFILE% -of %TMPAUDIOM4AFILE%
+set /a "ERRFLG = ERRFLG + ERRORLEVEL"
+
 set COUNT=1
 call :get_extension %VIDEOFINISHFILE%
 set EXT=%extension%
@@ -78,23 +82,25 @@ IF EXIST %VIDEOFINISHFILE% (
 )
 
 %CMDMP4BOX% -tmp . -add %TMPVIDEONOAUDIOFILE% -add %TMPAUDIOM4AFILE% -new %VIDEOFINISHFILE%
-if %ERRORLEVEL% == 0 (
+set /a "ERRFLG = ERRFLG + ERRORLEVEL"
+
+echo エンコード完了！！！(何かキーを押すと中間ファイルを消して終了します)
+pause
+if %ERRFLG% == 0 (
  del %AVSFILE%
  del %TMPAUDIOWAVFILE%
  del %TMPAUDIOM4AFILE%
  del %TMPVIDEONOAUDIOFILE%
 )
 
-echo エンコード完了！！！
 popd
-pause
 exit
 
 
 :movieread
 set AVSFILE="%~n1_ame.avs"
 if "%~x1" == ".avi" (
-  call :aviread "%~1"
+  call :tsread "%~1"
 ) else if "%~x1" == ".avs" (
   call :avsread "%~1"
 ) else if "%~x1" == ".ts" (
@@ -110,7 +116,7 @@ exit /b
 
 :aviread
 echo DirectShowSource(%*) 1>%AVSFILE%
-echo ConvertToYV12() 1>>%AVSFILE%
+rem echo ConvertToYV12() 1>>%AVSFILE%
 exit /b
 
 :dsread
@@ -120,20 +126,20 @@ rem echo AudioDub(FFAudioSource(%*)) 1>>%AVSFILE%
 echo LoadPlugin(%DLLLAMDASH%) 1>%AVSFILE%
 echo LSMASHVideoSource(%*) 1>>%AVSFILE%
 echo AudioDub(LSMASHAudioSource(%*)) 1>>%AVSFILE%
-echo ConvertToYV12() 1>>%AVSFILE%
+rem echo ConvertToYV12() 1>>%AVSFILE%
 exit /b
 
 :tsread
 echo LoadPlugin(%DLLLAMDASH%) 1>%AVSFILE%
-echo LWLibavVideoSource(source=%*, stream_index=-1, repeat=true) 1>>%AVSFILE%
-echo AudioDub(LWLibavAudioSource(source=%*, stream_index=-1, av_sync=false)) 1>>%AVSFILE%
-echo ConvertToYV12() 1>>%AVSFILE%
+echo LWLibavVideoSource(source=%*, stream_index=-1, repeat=true, cache=false) 1>>%AVSFILE%
+echo AudioDub(LWLibavAudioSource(source=%*, stream_index=-1, av_sync=false, cache=false )) 1>>%AVSFILE%
+rem echo ConvertToYV12() 1>>%AVSFILE%
 exit /b
 
 
 :avsread
 echo Import(%*) 1>%AVSFILE%
-echo ConvertToYV12() 1>>%AVSFILE%
+rem echo ConvertToYV12() 1>>%AVSFILE%
 exit /b
 
 :assread2

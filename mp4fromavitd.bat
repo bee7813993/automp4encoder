@@ -53,7 +53,7 @@ exit
 :movieread
 set AVSFILE="%~dpn1_ame.avs"
 if "%~x1" == ".avi" (
-  call :aviread "%~1"
+  call :tsread "%~1"
 ) else if "%~x1" == ".avs" (
   call :avsread "%~1"
 ) else if "%~x1" == ".ts" (

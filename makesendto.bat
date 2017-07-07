@@ -7,6 +7,12 @@ echo oShellLink.WindowStyle = 1 >>shortcut.vbs
 echo oShellLink.Save >>shortcut.vbs
 shortcut.vbs
 
+echo set WshShell = WScript.CreateObject("WScript.Shell") >shortcut.vbs
+echo set oShellLink = WshShell.CreateShortcut(("%USERPROFILE%\AppData\Roaming\Microsoft\Windows\SendTo\mp4fromavi_nv.batへのショートカット" ^& ".lnk")) >>shortcut.vbs
+echo oShellLink.TargetPath = "%~dp0mp4fromavi_nv.bat" >>shortcut.vbs
+echo oShellLink.WindowStyle = 1 >>shortcut.vbs
+echo oShellLink.Save >>shortcut.vbs
+shortcut.vbs
 
 echo set WshShell = WScript.CreateObject("WScript.Shell") >shortcut.vbs
 echo set oShellLink = WshShell.CreateShortcut(("%USERPROFILE%\AppData\Roaming\Microsoft\Windows\SendTo\mp4fromavi.batへのショートカット" ^& ".lnk")) >>shortcut.vbs
