@@ -26,7 +26,9 @@ set CMDMP4BOX="%~dp0\MP4Box.exe"
 set DLLFFMS="%~dp0\AvisynthPlugins\ffms2.dll"
 set DLLLAMDASH="%~dp0\AvisynthPlugins\LSMASHSource.dll"
 set DLLVSFILTER="%~dp0\AvisynthPlugins\VSFilterMod.dll"
+set MEDIAINFO="%~dp0\tools\MediaInfo.exe"
 set WORKFOLDER="%~dp1"
+set TEMP_INFO=temp_movieinfo.txt
 
 set MOVIEINDEX=0
 set ASSINDEX=0
@@ -55,6 +57,28 @@ if not '%MOVIEFILE%' == '' (
   exit /b
 )
 
+rem ƒƒfƒBƒAî•ñŽæ“¾
+:interlace
+%MEDIAINFO% --Inform=Video;%%ScanType%% --LogFile=%TEMP_INFO% %MOVIEFILE%>nul
+for /f "delims=" %%i in (%TEMP_INFO%) do set SCAN_TYPE=%%i
+if defined SCAN_TYPE echo Scan Type      : %SCAN_TYPE%
+%MEDIAINFO% --Inform=Video;%%ScanOrder%% --LogFile=%TEMP_INFO% %MOVIEFILE%>nul
+for /f "delims=" %%i in (%TEMP_INFO%) do set SCAN_ORDER=%%i
+if defined SCAN_ORDER echo Scan Order     : %SCAN_ORDER%
+set FEALDODEROPT=
+if /i "%SCAN_TYPE%" == "Interlaced" (
+    rem echo AssumeFieldBased^( ^) 1>>%AVSFILE%
+      if /i "%SCAN_ORDER%" == "TFF" (
+          echo AssumeTFF^( ^) 1>>%AVSFILE%
+          set FEALDODEROPT=--tff
+      )
+      if /i "%SCAN_ORDER%" == "BFF" (
+          echo AssumeBFF^( ^) 1>>%AVSFILE%
+          set FEALDODEROPT=--bff
+      )
+)
+
+
 set /a ASSCOUNT=!ASSINDEX!-1
 FOR /L %%L IN (0,1,!ASSCOUNT!) DO (
 set fn=!ASSFILE[%%L]!
@@ -67,7 +91,7 @@ echo return last 1>>%AVSFILE%
 
 %CMDAVSWAV% %AVSFILE% %TMPAUDIOWAVFILE%
 rem %CMDX264% -q %VIDEOQUALITY% --threads auto --output %TMPVIDEONOAUDIOFILE%  %AVSFILE%
-%CMDQSVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
+%CMDQSVENC% %FEALDODEROPT% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
 rem %CMDNVENC% --cqp %VIDEOQUALITY% -i %AVSFILE% -o %TMPVIDEONOAUDIOFILE%
 set /a "ERRFLG = ERRFLG + ERRORLEVEL"
 %CMDAACENC% -q %AUDIOQUALITY% -ignorelength -if %TMPAUDIOWAVFILE% -of %TMPAUDIOM4AFILE%
@@ -91,6 +115,7 @@ if %ERRFLG% == 0 (
  del %TMPAUDIOWAVFILE%
  del %TMPAUDIOM4AFILE%
  del %TMPVIDEONOAUDIOFILE%
+ del %TEMP_INFO%
 )
 
 popd
@@ -99,13 +124,15 @@ exit
 
 :movieread
 set AVSFILE="%~n1_ame.avs"
-if "%~x1" == ".avi" (
+if /i "%~x1" == ".avi" (
   call :tsread "%~1"
-) else if "%~x1" == ".avs" (
+) else if /i "%~x1" == ".avs" (
   call :avsread "%~1"
-) else if "%~x1" == ".ts" (
+) else if /i "%~x1" == ".ts" (
   call :tsread "%~1"
-) else if "%~x1" == ".m2ts" (
+) else if /i "%~x1" == ".m2ts" (
+  call :tsread "%~1"
+) else if /i "%~x1" == ".vob" (
   call :tsread "%~1"
 ) else (
   call :dsread "%~1"
